@@ -1,0 +1,10 @@
+{
+  "name": "com.kulagin.statemachine",
+  "version": "1.0.0",
+  "displayName": "Kulagin State Machine",
+  "description": "Generic strongly typed state machine framework for Unity.",
+  "unity": "6000.0",
+  "author": {
+    "name": "Kulagin"
+  }
+}
