@@ -1,0 +1,9 @@
+{
+  "name": "Kulagin.StateMachine.Unity.Tests",
+  "references": [
+    "Kulagin.StateMachine.Unity"
+  ],
+  "optionalUnityReferences": [
+    "TestAssemblies"
+  ]
+}
