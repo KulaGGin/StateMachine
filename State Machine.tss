@@ -2,7 +2,25 @@
 <ArrayOfArrayOfArrayOfString xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <ArrayOfArrayOfString>
     <ArrayOfString>
-      <string>D:\Projects\Unity\State Machine\Kulagin.StateMachine.Core.Tests.csproj</string>
+      <string>D:\Projects\Unity\State Machine\Packages\com.kulagin.statemachine\Runtime\Core\State.cs</string>
+    </ArrayOfString>
+    <ArrayOfString>
+      <string>D:\Projects\Unity\State Machine\Packages\com.kulagin.statemachine\Runtime\Unity\GameplayState.cs</string>
+    </ArrayOfString>
+    <ArrayOfString>
+      <string>D:\Projects\Unity\State Machine\Packages\com.kulagin.statemachine\Tests\Unity\GameplayStateTests.cs</string>
+    </ArrayOfString>
+    <ArrayOfString>
+      <string>D:\Projects\Unity\State Machine\Packages\com.kulagin.statemachine\Runtime\Unity\UnityStateMachine.cs</string>
+    </ArrayOfString>
+    <ArrayOfString>
+      <string>D:\Projects\Unity\State Machine\Packages\com.kulagin.statemachine\Runtime\Core\StackStateMachine.cs</string>
+    </ArrayOfString>
+    <ArrayOfString>
+      <string>D:\Projects\Unity\State Machine\Kulagin.StateMachine.Unity.csproj</string>
+    </ArrayOfString>
+    <ArrayOfString>
+      <string>D:\Projects\Unity\State Machine\Packages\com.kulagin.statemachine\Tests\Unity2\GameplayStateTests.cs</string>
     </ArrayOfString>
   </ArrayOfArrayOfString>
 </ArrayOfArrayOfArrayOfString>
