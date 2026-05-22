@@ -1,0 +1,12 @@
+{
+  "name": "Kulagin.StateMachine.Core.Tests",
+  "references": [
+    "Kulagin.StateMachine.Core"
+  ],
+  "optionalUnityReferences": [
+      "TestAssemblies"
+  ],
+  "includePlatforms": [
+      "Editor"
+  ]
+}
