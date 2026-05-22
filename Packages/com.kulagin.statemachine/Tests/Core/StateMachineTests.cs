@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using NUnit.Framework;
-using Kulagin.StateMachine.Core;
 
 namespace Kulagin.StateMachine.Core.Tests {
     public class StateMachineTests {
@@ -9,8 +8,6 @@ namespace Kulagin.StateMachine.Core.Tests {
             public TestStateMachine() {
             }
 
-            public TestStateMachine(IEnumerable<TestState> StartStates) : base(StartStates) {
-            }
 
             public TestStateMachine(params TestState[] StartStates) : base(StartStates) {
             }
@@ -48,11 +45,6 @@ namespace Kulagin.StateMachine.Core.Tests {
             }
         }
 
-        private class SkatingState : TestState {
-            public SkatingState(TestStateMachine StateMachine) : base(StateMachine) {
-            }
-        }
-
         [Test]
         public void Constructor_WithEnumerable_RegistersStates() {
             var StateMachine = new TestStateMachine();
@@ -77,10 +69,7 @@ namespace Kulagin.StateMachine.Core.Tests {
             var IdleState = new IdleState(StateMachine);
             var WalkingState = new WalkingState(StateMachine);
 
-            StateMachine = new TestStateMachine(
-                IdleState,
-                WalkingState
-            );
+            StateMachine = new TestStateMachine(IdleState, WalkingState);
 
             StateMachine.StartStateMachine<IdleState>();
 
@@ -111,10 +100,7 @@ namespace Kulagin.StateMachine.Core.Tests {
             var IdleState = new IdleState(StateMachine);
             var WalkingState = new WalkingState(StateMachine);
 
-            StateMachine.SetStates(
-                IdleState,
-                WalkingState
-            );
+            StateMachine.SetStates(IdleState, WalkingState);
 
             StateMachine.StartStateMachine<IdleState>();
 
@@ -133,9 +119,9 @@ namespace Kulagin.StateMachine.Core.Tests {
 
             StateMachine.SetStates(WalkingState);
 
-            StateMachine.StartStateMachine<IdleState>();
-
-            Assert.IsNull(StateMachine.CurrentState);
+            Assert.Throws<ArgumentException>(() => {
+                StateMachine.StartStateMachine<IdleState>();
+            });
         }
 
         [Test]
@@ -204,19 +190,6 @@ namespace Kulagin.StateMachine.Core.Tests {
         }
 
         [Test]
-        public void StartStateMachine_InvalidState_DoesNothing() {
-            var StateMachine = new TestStateMachine();
-
-            var IdleState = new IdleState(StateMachine);
-
-            StateMachine.SetStates(IdleState);
-
-            StateMachine.StartStateMachine<WalkingState>();
-
-            Assert.IsNull(StateMachine.CurrentState);
-        }
-
-        [Test]
         public void IsInState_Generic_ReturnsTrueForCurrentState() {
             var StateMachine = new TestStateMachine();
 
@@ -236,10 +209,7 @@ namespace Kulagin.StateMachine.Core.Tests {
             var IdleState = new IdleState(StateMachine);
             var WalkingState = new WalkingState(StateMachine);
 
-            StateMachine.SetStates(
-                IdleState,
-                WalkingState
-            );
+            StateMachine.SetStates(IdleState, WalkingState);
 
             StateMachine.StartStateMachine<IdleState>();
 
@@ -266,10 +236,7 @@ namespace Kulagin.StateMachine.Core.Tests {
             var IdleState = new IdleState(StateMachine);
             var WalkingState = new WalkingState(StateMachine);
 
-            StateMachine.SetStates(
-                IdleState,
-                WalkingState
-            );
+            StateMachine.SetStates(IdleState, WalkingState);
 
             StateMachine.StartStateMachine<IdleState>();
 
@@ -283,10 +250,7 @@ namespace Kulagin.StateMachine.Core.Tests {
             var IdleState = new IdleState(StateMachine);
             var WalkingState = new WalkingState(StateMachine);
 
-            StateMachine.SetStates(
-                IdleState,
-                WalkingState
-            );
+            StateMachine.SetStates(IdleState, WalkingState);
 
             StateMachine.StartStateMachine<IdleState>();
 
@@ -302,10 +266,7 @@ namespace Kulagin.StateMachine.Core.Tests {
             var IdleState = new IdleState(StateMachine);
             var WalkingState = new WalkingState(StateMachine);
 
-            StateMachine.SetStates(
-                IdleState,
-                WalkingState
-            );
+            StateMachine.SetStates(IdleState, WalkingState);
 
             StateMachine.StartStateMachine<IdleState>();
 
@@ -321,10 +282,7 @@ namespace Kulagin.StateMachine.Core.Tests {
             var IdleState = new IdleState(StateMachine);
             var WalkingState = new WalkingState(StateMachine);
 
-            StateMachine.SetStates(
-                IdleState,
-                WalkingState
-            );
+            StateMachine.SetStates(IdleState, WalkingState);
 
             StateMachine.StartStateMachine<IdleState>();
 
@@ -340,10 +298,7 @@ namespace Kulagin.StateMachine.Core.Tests {
             var IdleState = new IdleState(StateMachine);
             var WalkingState = new WalkingState(StateMachine);
 
-            StateMachine.SetStates(
-                IdleState,
-                WalkingState
-            );
+            StateMachine.SetStates(IdleState, WalkingState);
 
             StateMachine.StartStateMachine<IdleState>();
 
@@ -359,10 +314,7 @@ namespace Kulagin.StateMachine.Core.Tests {
             var IdleState = new IdleState(StateMachine);
             var WalkingState = new WalkingState(StateMachine);
 
-            StateMachine.SetStates(
-                IdleState,
-                WalkingState
-            );
+            StateMachine.SetStates(IdleState, WalkingState);
 
             StateMachine.StartStateMachine<IdleState>();
 
@@ -378,10 +330,7 @@ namespace Kulagin.StateMachine.Core.Tests {
             var IdleState = new IdleState(StateMachine);
             var WalkingState = new WalkingState(StateMachine);
 
-            StateMachine.SetStates(
-                IdleState,
-                WalkingState
-            );
+            StateMachine.SetStates(IdleState, WalkingState);
 
             StateMachine.StartStateMachine<IdleState>();
 
@@ -397,46 +346,13 @@ namespace Kulagin.StateMachine.Core.Tests {
             var IdleState = new IdleState(StateMachine);
             var WalkingState = new WalkingState(StateMachine);
 
-            StateMachine.SetStates(
-                IdleState,
-                WalkingState
-            );
+            StateMachine.SetStates(IdleState, WalkingState);
 
             StateMachine.StartStateMachine<IdleState>();
 
             StateMachine.ApplyState<WalkingState>("Hello");
 
             Assert.AreEqual("Hello", WalkingState.ReceivedArgs);
-        }
-
-        [Test]
-        public void ApplyState_InvalidState_DoesNothing() {
-            var StateMachine = new TestStateMachine();
-
-            var IdleState = new IdleState(StateMachine);
-
-            StateMachine.SetStates(IdleState);
-
-            StateMachine.StartStateMachine<IdleState>();
-
-            StateMachine.ApplyState<WalkingState>();
-
-            Assert.AreEqual(IdleState, StateMachine.CurrentState);
-        }
-
-        [Test]
-        public void ApplyState_InvalidState_DoesNotExitCurrentState() {
-            var StateMachine = new TestStateMachine();
-
-            var IdleState = new IdleState(StateMachine);
-
-            StateMachine.SetStates(IdleState);
-
-            StateMachine.StartStateMachine<IdleState>();
-
-            StateMachine.ApplyState<WalkingState>();
-
-            Assert.IsFalse(IdleState.Exited);
         }
 
         [Test]
@@ -483,6 +399,69 @@ namespace Kulagin.StateMachine.Core.Tests {
             StateMachine.SetStates(IdleState);
 
             Assert.Throws<NullReferenceException>(() => { StateMachine.ApplyState<IdleState>(); });
+        }
+
+        [Test]
+        public void StartStateMachine_Generic_InvalidState_ThrowsArgumentException() {
+            var StateMachine = new TestStateMachine();
+            var IdleState = new IdleState(StateMachine);
+
+            StateMachine.SetStates(IdleState);
+
+            var Ex = Assert.Throws<ArgumentException>(() => StateMachine.StartStateMachine<WalkingState>());
+
+            Assert.That(Ex.Message, Contains.Substring("WalkingState"));
+            Assert.That(Ex.ParamName, Is.EqualTo("StartingState"));
+        }
+
+        [Test]
+        public void StartStateMachine_Type_InvalidState_ThrowsArgumentException() {
+            var StateMachine = new TestStateMachine();
+            var IdleState = new IdleState(StateMachine);
+
+            StateMachine.SetStates(IdleState);
+
+            var Ex = Assert.Throws<ArgumentException>(() => StateMachine.StartStateMachine(typeof(WalkingState)));
+
+            Assert.That(Ex.Message, Contains.Substring("WalkingState"));
+        }
+
+        [Test]
+        public void StartStateMachine_InvalidState_DoesNotSetCurrentState() {
+            var StateMachine = new TestStateMachine();
+            var IdleState = new IdleState(StateMachine);
+
+            StateMachine.SetStates(IdleState);
+
+            Assert.Throws<ArgumentException>(() => StateMachine.StartStateMachine<WalkingState>());
+
+            Assert.IsNull(StateMachine.CurrentState);
+        }
+
+        [Test]
+        public void ApplyState_InvalidState_ThrowsArgumentException() {
+            var StateMachine = new TestStateMachine();
+            var IdleState = new IdleState(StateMachine);
+
+            StateMachine.SetStates(IdleState);
+            StateMachine.StartStateMachine<IdleState>();
+
+            var Ex = Assert.Throws<ArgumentException>(() => StateMachine.ApplyState<WalkingState>());
+
+            Assert.That(Ex.Message, Contains.Substring("WalkingState"));
+        }
+
+        [Test]
+        public void ApplyState_InvalidState_PreservesCurrentState() {
+            var StateMachine = new TestStateMachine();
+            var IdleState = new IdleState(StateMachine);
+
+            StateMachine.SetStates(IdleState);
+            StateMachine.StartStateMachine<IdleState>();
+
+            Assert.Throws<ArgumentException>(() => StateMachine.ApplyState<WalkingState>());
+
+            Assert.AreEqual(IdleState, StateMachine.CurrentState);
         }
     }
 }

@@ -38,9 +38,16 @@ namespace Kulagin.StateMachine.Core {
         }
 
         public virtual void StartStateMachine(System.Type StartingState) {
+            if (StartingState == null) {
+                throw new ArgumentNullException(nameof(StartingState), "Starting state cannot be null.");
+            }
+
             if (!States.ContainsKey(StartingState)) {
-                Debug.Log($"Tried to start with a state that's not inside state machine: \"{StartingState}\"");
-                return;
+                throw new ArgumentException(
+                    $"State '{StartingState.Name}' is not registered in this state machine. " +
+                    $"Register it first using SetStates().",
+                    nameof(StartingState)
+                );
             }
 
             CurrentState = States[StartingState];
@@ -61,9 +68,16 @@ namespace Kulagin.StateMachine.Core {
         }
 
         public virtual void ApplyState(System.Type StateID, object StateEventArgs = null) {
+            if (StateID == null) {
+                throw new ArgumentNullException(nameof(StateID), "Target state cannot be null.");
+            }
+
             if (!States.ContainsKey(StateID)) {
-                Debug.Log($"Tried to switch to a state that's not inside state machine: \"{StateID}\"");
-                return;
+                throw new ArgumentException(
+                    $"State '{StateID.Name}' is not registered in this state machine. " +
+                    $"Register it first using SetStates().",
+                    nameof(StateID)
+                );
             }
 
             CurrentState.ExitState();
