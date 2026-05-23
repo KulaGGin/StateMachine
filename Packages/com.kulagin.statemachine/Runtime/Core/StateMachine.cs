@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using UnityEngine;
 
 namespace Kulagin.StateMachine.Core {
     public class StateMachine<TStateMachine, TStateClass>
@@ -59,7 +58,7 @@ namespace Kulagin.StateMachine.Core {
         }
 
         public bool IsInState(System.Type State) {
-            return CurrentState == States[State];
+            return States.TryGetValue(State, out var state) && CurrentState == state;
         }
 
         public virtual void ApplyState<T>(object StateEventArgs = null)
