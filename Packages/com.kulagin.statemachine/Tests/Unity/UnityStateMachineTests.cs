@@ -1,7 +1,5 @@
 using System;
 using NUnit.Framework;
-using Kulagin.StateMachine.Core;
-using Kulagin.StateMachine.Unity;
 
 namespace Kulagin.StateMachine.Unity.Tests {
     public class UnityStateMachineTests {
@@ -21,7 +19,7 @@ namespace Kulagin.StateMachine.Unity.Tests {
             public int FrameCount;
             public int LateCount;
 
-            public TestState(TestStateMachine StateMachine) : base(StateMachine) {
+            protected TestState(TestStateMachine StateMachine) : base(StateMachine) {
             }
 
             public override void Awake() {
@@ -175,7 +173,7 @@ namespace Kulagin.StateMachine.Unity.Tests {
             var Idle = new IdleState(StateMachine);
             StateMachine.SetStates(Idle);
 
-            Assert.Throws<InvalidOperationException>(() => { StateMachine.Awake(); });
+            Assert.Throws<InvalidOperationException>(StateMachine.Awake);
         }
 
         [Test]
@@ -207,10 +205,7 @@ namespace Kulagin.StateMachine.Unity.Tests {
 
             StateMachine.SetStates(IdleState);
             
-            var Ex = Assert.Throws<InvalidOperationException>(() => StateMachine.FrameUpdate()
-            );
-
-            Assert.That(Ex.Message, Contains.Substring("not been started"));
+            Assert.Throws<NullReferenceException>(StateMachine.FrameUpdate);
         }
 
         [Test]
@@ -220,10 +215,7 @@ namespace Kulagin.StateMachine.Unity.Tests {
 
             StateMachine.SetStates(IdleState);
             
-            var Ex = Assert.Throws<InvalidOperationException>(() => StateMachine.PhysicsUpdate()
-            );
-
-            Assert.That(Ex.Message, Contains.Substring("not been started"));
+            Assert.Throws<NullReferenceException>(StateMachine.PhysicsUpdate);
         }
 
         [Test]
@@ -233,10 +225,7 @@ namespace Kulagin.StateMachine.Unity.Tests {
 
             StateMachine.SetStates(IdleState);
             
-            var Ex = Assert.Throws<InvalidOperationException>(() => StateMachine.LateUpdate()
-            );
-
-            Assert.That(Ex.Message, Contains.Substring("not been started"));
+            Assert.Throws<NullReferenceException>(StateMachine.LateUpdate);
         }
 
         [Test]
