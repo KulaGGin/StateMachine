@@ -162,7 +162,7 @@ namespace Kulagin.StateMachine.Core.Tests {
 
             StateMachine.ApplyState<PauseState>();
 
-            StateMachine.PopState();
+            StateMachine.TryPopState();
 
             Assert.AreEqual(1, StateMachine.StatesStack.Count);
             Assert.AreEqual(typeof(IdleState), StateMachine.StatesStack.Peek());
@@ -181,7 +181,7 @@ namespace Kulagin.StateMachine.Core.Tests {
 
             StateMachine.ApplyState<PauseState>();
 
-            StateMachine.PopState();
+            StateMachine.TryPopState();
 
             Assert.AreEqual(IdleState, StateMachine.CurrentState);
         }
@@ -201,7 +201,7 @@ namespace Kulagin.StateMachine.Core.Tests {
 
             StateMachine.ApplyState<PauseState>();
 
-            StateMachine.PopState();
+            StateMachine.TryPopState();
 
             Assert.IsTrue(IdleState.Entered);
         }
@@ -219,7 +219,7 @@ namespace Kulagin.StateMachine.Core.Tests {
 
             StateMachine.ApplyState<PauseState>();
 
-            StateMachine.PopState();
+            StateMachine.TryPopState();
 
             Assert.IsTrue(PauseState.Exited);
         }
@@ -263,9 +263,114 @@ namespace Kulagin.StateMachine.Core.Tests {
 
             StateMachine.ApplyState<MenuState>();
 
-            StateMachine.PopState();
+            StateMachine.TryPopState();
 
             Assert.AreEqual(PauseState, StateMachine.CurrentState);
+        }
+        
+        [Test]
+        public void TryPopState_WithMultipleStatesOnStack_RemovesTopState() {
+            var StateMachine = new TestStackStateMachine();
+            var IdleState = new IdleState(StateMachine);
+            var PauseState = new PauseState(StateMachine);
+
+            StateMachine.SetStates(IdleState, PauseState);
+            StateMachine.StartStateMachine<IdleState>();
+            StateMachine.ApplyState<PauseState>();
+            
+            var Result = StateMachine.TryPopState();
+            
+            Assert.IsTrue(Result);
+            Assert.AreEqual(IdleState, StateMachine.CurrentState);
+        }
+
+        [Test]
+        public void TryPopState_WithOnlyRootState_ReturnsFalse() {
+            var StateMachine = new TestStackStateMachine();
+            var IdleState = new IdleState(StateMachine);
+
+            StateMachine.SetStates(IdleState);
+            StateMachine.StartStateMachine<IdleState>();
+            
+            var Result = StateMachine.TryPopState();
+            
+            Assert.IsFalse(Result);
+        }
+
+        [Test]
+        public void TryPopState_WithOnlyRootState_PreservesCurrentState() {
+            var StateMachine = new TestStackStateMachine();
+            var IdleState = new IdleState(StateMachine);
+
+            StateMachine.SetStates(IdleState);
+            StateMachine.StartStateMachine<IdleState>();
+            
+            StateMachine.TryPopState();
+            
+            Assert.AreEqual(IdleState, StateMachine.CurrentState);
+        }
+
+        [Test]
+        public void TryPopState_WithOnlyRootState_DoesNotExitState() {
+            var StateMachine = new TestStackStateMachine();
+            var IdleState = new IdleState(StateMachine);
+
+            StateMachine.SetStates(IdleState);
+            StateMachine.StartStateMachine<IdleState>();
+            
+            StateMachine.TryPopState();
+            
+            Assert.IsFalse(IdleState.Exited);
+        }
+
+        [Test]
+        public void TryPopState_AfterMultiplePushes_ReturnsToCorrectPreviousState() {
+            var StateMachine = new TestStackStateMachine();
+            var IdleState = new IdleState(StateMachine);
+            var PauseState = new PauseState(StateMachine);
+            var MenuState = new MenuState(StateMachine);
+
+            StateMachine.SetStates(IdleState, PauseState, MenuState);
+            StateMachine.StartStateMachine<IdleState>();
+            StateMachine.ApplyState<PauseState>();
+            StateMachine.ApplyState<MenuState>();
+            
+            var Result = StateMachine.TryPopState();
+            
+            Assert.IsTrue(Result);
+            Assert.AreEqual(PauseState, StateMachine.CurrentState);
+        }
+
+        [Test]
+        public void TryPopState_CallsExitOnPoppedState() {
+            var StateMachine = new TestStackStateMachine();
+            var IdleState = new IdleState(StateMachine);
+            var PauseState = new PauseState(StateMachine);
+
+            StateMachine.SetStates(IdleState, PauseState);
+            StateMachine.StartStateMachine<IdleState>();
+            StateMachine.ApplyState<PauseState>();
+            
+            StateMachine.TryPopState();
+            
+            Assert.IsTrue(PauseState.Exited);
+        }
+
+        [Test]
+        public void TryPopState_CallsEnterOnPreviousState() {
+            var StateMachine = new TestStackStateMachine();
+            var IdleState = new IdleState(StateMachine);
+            var PauseState = new PauseState(StateMachine);
+
+            StateMachine.SetStates(IdleState, PauseState);
+            StateMachine.StartStateMachine<IdleState>();
+
+            IdleState.Entered = false;
+
+            StateMachine.ApplyState<PauseState>();
+            StateMachine.TryPopState();
+            
+            Assert.IsTrue(IdleState.Entered);
         }
     }
 }

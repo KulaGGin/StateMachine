@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using NUnit.Framework;
 
 namespace Kulagin.StateMachine.Core.Tests {
@@ -20,7 +19,7 @@ namespace Kulagin.StateMachine.Core.Tests {
             public int ExitCount;
             public object ReceivedArgs;
 
-            public TestState(TestStateMachine StateMachine) : base(StateMachine) {
+            protected TestState(TestStateMachine StateMachine) : base(StateMachine) {
             }
 
             public override void EnterState(object StateEventArgs = null) {
@@ -119,9 +118,7 @@ namespace Kulagin.StateMachine.Core.Tests {
 
             StateMachine.SetStates(WalkingState);
 
-            Assert.Throws<ArgumentException>(() => {
-                StateMachine.StartStateMachine<IdleState>();
-            });
+            Assert.Throws<ArgumentException>(StateMachine.StartStateMachine<IdleState>);
         }
 
         [Test]
@@ -408,7 +405,7 @@ namespace Kulagin.StateMachine.Core.Tests {
 
             StateMachine.SetStates(IdleState);
 
-            var Ex = Assert.Throws<ArgumentException>(() => StateMachine.StartStateMachine<WalkingState>());
+            var Ex = Assert.Throws<ArgumentException>(StateMachine.StartStateMachine<WalkingState>);
 
             Assert.That(Ex.Message, Contains.Substring("WalkingState"));
             Assert.That(Ex.ParamName, Is.EqualTo("StartingState"));
@@ -433,7 +430,7 @@ namespace Kulagin.StateMachine.Core.Tests {
 
             StateMachine.SetStates(IdleState);
 
-            Assert.Throws<ArgumentException>(() => StateMachine.StartStateMachine<WalkingState>());
+            Assert.Throws<ArgumentException>(StateMachine.StartStateMachine<WalkingState>);
 
             Assert.IsNull(StateMachine.CurrentState);
         }

@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace Kulagin.StateMachine.Core {
+    // TODO Add CanPop
     public abstract class StackStateMachine<TStateMachine, TStateClass> : StateMachine<TStateMachine, TStateClass>
         where TStateMachine : StateMachine<TStateMachine, TStateClass>
         where TStateClass : State<TStateMachine, TStateClass> {
@@ -17,9 +19,15 @@ namespace Kulagin.StateMachine.Core {
             base.ApplyState(StateID, StateEventArgs);
         }
 
-        public void PopState() {
+        public bool TryPopState() {
+            if (StatesStack.Count <= 1) {
+                Debug.LogWarning("Cannot pop the root state");
+                return false;
+            }
+    
             StatesStack.Pop();
             base.ApplyState(StatesStack.Peek());
+            return true;
         }
     }
 }

@@ -175,9 +175,7 @@ namespace Kulagin.StateMachine.Unity.Tests {
             var Idle = new IdleState(StateMachine);
             StateMachine.SetStates(Idle);
 
-            Assert.Throws<InvalidOperationException>(() => {
-                StateMachine.Awake();
-            });
+            Assert.Throws<InvalidOperationException>(() => { StateMachine.Awake(); });
         }
 
         [Test]
@@ -200,6 +198,84 @@ namespace Kulagin.StateMachine.Unity.Tests {
 
             Assert.IsFalse(Idle.AwakeCalled);
             Assert.IsTrue(Move.AwakeCalled);
+        }
+        
+        [Test]
+        public void FrameUpdate_WithoutStarting_ThrowsInvalidOperationException() {
+            var StateMachine = new TestStateMachine();
+            var IdleState = new IdleState(StateMachine);
+
+            StateMachine.SetStates(IdleState);
+            
+            var Ex = Assert.Throws<InvalidOperationException>(() => StateMachine.FrameUpdate()
+            );
+
+            Assert.That(Ex.Message, Contains.Substring("not been started"));
+        }
+
+        [Test]
+        public void PhysicsUpdate_WithoutStarting_ThrowsInvalidOperationException() {
+            var StateMachine = new TestStateMachine();
+            var IdleState = new IdleState(StateMachine);
+
+            StateMachine.SetStates(IdleState);
+            
+            var Ex = Assert.Throws<InvalidOperationException>(() => StateMachine.PhysicsUpdate()
+            );
+
+            Assert.That(Ex.Message, Contains.Substring("not been started"));
+        }
+
+        [Test]
+        public void LateUpdate_WithoutStarting_ThrowsInvalidOperationException() {
+            var StateMachine = new TestStateMachine();
+            var IdleState = new IdleState(StateMachine);
+
+            StateMachine.SetStates(IdleState);
+            
+            var Ex = Assert.Throws<InvalidOperationException>(() => StateMachine.LateUpdate()
+            );
+
+            Assert.That(Ex.Message, Contains.Substring("not been started"));
+        }
+
+        [Test]
+        public void FrameUpdate_AfterStart_CallsStateFrameUpdate() {
+            var StateMachine = new TestStateMachine();
+            var IdleState = new IdleState(StateMachine);
+
+            StateMachine.SetStates(IdleState);
+            StateMachine.StartStateMachine<IdleState>();
+            
+            StateMachine.FrameUpdate();
+            
+            Assert.IsTrue(IdleState.FrameUpdateCalled);
+        }
+
+        [Test]
+        public void PhysicsUpdate_AfterStart_CallsStatePhysicsUpdate() {
+            var StateMachine = new TestStateMachine();
+            var IdleState = new IdleState(StateMachine);
+
+            StateMachine.SetStates(IdleState);
+            StateMachine.StartStateMachine<IdleState>();
+            
+            StateMachine.PhysicsUpdate();
+            
+            Assert.IsTrue(IdleState.PhysicsUpdateCalled);
+        }
+
+        [Test]
+        public void LateUpdate_AfterStart_CallsStateLateUpdate() {
+            var StateMachine = new TestStateMachine();
+            var IdleState = new IdleState(StateMachine);
+
+            StateMachine.SetStates(IdleState);
+            StateMachine.StartStateMachine<IdleState>();
+            
+            StateMachine.LateUpdate();
+            
+            Assert.IsTrue(IdleState.LateUpdateCalled);
         }
     }
 }
