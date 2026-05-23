@@ -372,5 +372,56 @@ namespace Kulagin.StateMachine.Core.Tests {
             
             Assert.IsTrue(IdleState.Entered);
         }
+        
+        [Test]
+        public void CanPop_WithOnlyRootState_ReturnsFalse() {
+            var StateMachine = new TestStackStateMachine();
+            var IdleState = new IdleState(StateMachine);
+
+            StateMachine.SetStates(IdleState);
+            StateMachine.StartStateMachine<IdleState>();
+
+            Assert.IsFalse(StateMachine.CanPop);
+        }
+
+        [Test]
+        public void CanPop_WithMultipleStatesOnStack_ReturnsTrue() {
+            var StateMachine = new TestStackStateMachine();
+            var IdleState = new IdleState(StateMachine);
+            var PauseState = new PauseState(StateMachine);
+
+            StateMachine.SetStates(IdleState, PauseState);
+            StateMachine.StartStateMachine<IdleState>();
+            StateMachine.ApplyState<PauseState>();
+
+            Assert.IsTrue(StateMachine.CanPop);
+        }
+
+        [Test]
+        public void CanPop_AfterTryPopState_ReturnsFalse() {
+            var StateMachine = new TestStackStateMachine();
+            var IdleState = new IdleState(StateMachine);
+            var PauseState = new PauseState(StateMachine);
+
+            StateMachine.SetStates(IdleState, PauseState);
+            StateMachine.StartStateMachine<IdleState>();
+            StateMachine.ApplyState<PauseState>();
+            StateMachine.TryPopState();
+
+            Assert.IsFalse(StateMachine.CanPop);
+        }
+
+        [Test]
+        public void CanPop_IsConsistentWithTryPopStateReturnValue() {
+            var StateMachine = new TestStackStateMachine();
+            var IdleState = new IdleState(StateMachine);
+            var PauseState = new PauseState(StateMachine);
+
+            StateMachine.SetStates(IdleState, PauseState);
+            StateMachine.StartStateMachine<IdleState>();
+            StateMachine.ApplyState<PauseState>();
+
+            Assert.AreEqual(StateMachine.CanPop, StateMachine.TryPopState());
+        }
     }
 }

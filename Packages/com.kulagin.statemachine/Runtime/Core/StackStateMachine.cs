@@ -9,6 +9,8 @@ namespace Kulagin.StateMachine.Core {
         where TStateClass : State<TStateMachine, TStateClass> {
         public readonly Stack<Type> StatesStack = new();
 
+        public bool CanPop => StatesStack.Count > 1;
+
         public override void StartStateMachine(Type StartingState) {
             StatesStack.Push(StartingState);
             base.StartStateMachine(StartingState);
@@ -20,11 +22,11 @@ namespace Kulagin.StateMachine.Core {
         }
 
         public bool TryPopState() {
-            if (StatesStack.Count <= 1) {
+            if (!CanPop) {
                 Debug.LogWarning("Cannot pop the root state");
                 return false;
             }
-    
+
             StatesStack.Pop();
             base.ApplyState(StatesStack.Peek());
             return true;
