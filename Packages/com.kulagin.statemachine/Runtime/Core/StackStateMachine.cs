@@ -10,13 +10,13 @@ namespace Kulagin.StateMachine.Core {
         public bool CanPop => StatesStack.Count > 1;
 
         public override void StartStateMachine(Type StartingState) {
-            StatesStack.Push(StartingState);
             base.StartStateMachine(StartingState);
+            StatesStack.Push(StartingState);
         }
 
         public override void ApplyState(Type StateID, object StateEventArgs = null) {
-            StatesStack.Push(StateID);
             base.ApplyState(StateID, StateEventArgs);
+            StatesStack.Push(StateID);
         }
 
         public bool TryPopState() {
