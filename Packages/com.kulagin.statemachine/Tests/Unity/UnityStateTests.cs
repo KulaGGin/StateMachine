@@ -47,170 +47,127 @@ namespace Kulagin.StateMachine.Unity.Tests {
                 LateUpdateCallCount++;
             }
         }
+        
+        private TestStateMachine _StateMachine;
+        private TestUnityState _State;
+
+        [SetUp]
+        public void Setup() {
+            _StateMachine = new TestStateMachine();
+            _State = new TestUnityState(_StateMachine);
+        }
 
         [Test]
         public void Constructor_StoresStateMachineReference() {
-            var StateMachine = new TestStateMachine();
-
-            var State = new TestUnityState(StateMachine);
-
-            Assert.AreEqual(StateMachine, State.StateMachine);
+            Assert.AreEqual(_StateMachine, _State.StateMachine);
         }
 
         [Test]
         public void Awake_CanBeOverridden() {
-            var StateMachine = new TestStateMachine();
+            _State.Awake();
 
-            var State = new TestUnityState(StateMachine);
-
-            State.Awake();
-
-            Assert.IsTrue(State.AwakeCalled);
+            Assert.IsTrue(_State.AwakeCalled);
         }
 
         [Test]
         public void Awake_CallsOverrideExactlyOnce() {
-            var StateMachine = new TestStateMachine();
+            _State.Awake();
 
-            var State = new TestUnityState(StateMachine);
-
-            State.Awake();
-
-            Assert.AreEqual(1, State.AwakeCallCount);
+            Assert.AreEqual(1, _State.AwakeCallCount);
         }
 
         [Test]
         public void Start_CanBeOverridden() {
-            var StateMachine = new TestStateMachine();
+            _State.Start();
 
-            var State = new TestUnityState(StateMachine);
-
-            State.Start();
-
-            Assert.IsTrue(State.StartCalled);
+            Assert.IsTrue(_State.StartCalled);
         }
 
         [Test]
         public void Start_CallsOverrideExactlyOnce() {
-            var StateMachine = new TestStateMachine();
+            _State.Start();
 
-            var State = new TestUnityState(StateMachine);
-
-            State.Start();
-
-            Assert.AreEqual(1, State.StartCallCount);
+            Assert.AreEqual(1, _State.StartCallCount);
         }
 
         [Test]
         public void FrameUpdate_CanBeOverridden() {
-            var StateMachine = new TestStateMachine();
+            _State.FrameUpdate();
 
-            var State = new TestUnityState(StateMachine);
-
-            State.FrameUpdate();
-
-            Assert.IsTrue(State.FrameUpdateCalled);
+            Assert.IsTrue(_State.FrameUpdateCalled);
         }
 
         [Test]
         public void FrameUpdate_CallsOverrideExactlyOnce() {
-            var StateMachine = new TestStateMachine();
+            _State.FrameUpdate();
 
-            var State = new TestUnityState(StateMachine);
-
-            State.FrameUpdate();
-
-            Assert.AreEqual(1, State.FrameUpdateCallCount);
+            Assert.AreEqual(1, _State.FrameUpdateCallCount);
         }
 
         [Test]
         public void PhysicsUpdate_CanBeOverridden() {
-            var StateMachine = new TestStateMachine();
+            _State.PhysicsUpdate();
 
-            var State = new TestUnityState(StateMachine);
-
-            State.PhysicsUpdate();
-
-            Assert.IsTrue(State.PhysicsUpdateCalled);
+            Assert.IsTrue(_State.PhysicsUpdateCalled);
         }
 
         [Test]
         public void PhysicsUpdate_CallsOverrideExactlyOnce() {
-            var StateMachine = new TestStateMachine();
+            _State.PhysicsUpdate();
 
-            var State = new TestUnityState(StateMachine);
-
-            State.PhysicsUpdate();
-
-            Assert.AreEqual(1, State.PhysicsUpdateCallCount);
+            Assert.AreEqual(1, _State.PhysicsUpdateCallCount);
         }
 
         [Test]
         public void LateUpdate_CanBeOverridden() {
-            var StateMachine = new TestStateMachine();
+            _State.LateUpdate();
 
-            var State = new TestUnityState(StateMachine);
-
-            State.LateUpdate();
-
-            Assert.IsTrue(State.LateUpdateCalled);
+            Assert.IsTrue(_State.LateUpdateCalled);
         }
 
         [Test]
         public void LateUpdate_CallsOverrideExactlyOnce() {
-            var StateMachine = new TestStateMachine();
+            _State.LateUpdate();
 
-            var State = new TestUnityState(StateMachine);
-
-            State.LateUpdate();
-
-            Assert.AreEqual(1, State.LateUpdateCallCount);
+            Assert.AreEqual(1, _State.LateUpdateCallCount);
         }
 
         [Test]
         public void MultipleLifecycleMethods_CanAllBeCalledIndependently() {
-            var StateMachine = new TestStateMachine();
+            _State.Awake();
+            _State.Start();
+            _State.FrameUpdate();
+            _State.PhysicsUpdate();
+            _State.LateUpdate();
 
-            var State = new TestUnityState(StateMachine);
-
-            State.Awake();
-            State.Start();
-            State.FrameUpdate();
-            State.PhysicsUpdate();
-            State.LateUpdate();
-
-            Assert.IsTrue(State.AwakeCalled);
-            Assert.IsTrue(State.StartCalled);
-            Assert.IsTrue(State.FrameUpdateCalled);
-            Assert.IsTrue(State.PhysicsUpdateCalled);
-            Assert.IsTrue(State.LateUpdateCalled);
+            Assert.IsTrue(_State.AwakeCalled);
+            Assert.IsTrue(_State.StartCalled);
+            Assert.IsTrue(_State.FrameUpdateCalled);
+            Assert.IsTrue(_State.PhysicsUpdateCalled);
+            Assert.IsTrue(_State.LateUpdateCalled);
         }
 
         [Test]
         public void MultipleLifecycleMethods_TrackIndependentCallCounts() {
-            var StateMachine = new TestStateMachine();
+            _State.Awake();
+            _State.Awake();
 
-            var State = new TestUnityState(StateMachine);
+            _State.Start();
 
-            State.Awake();
-            State.Awake();
+            _State.FrameUpdate();
+            _State.FrameUpdate();
+            _State.FrameUpdate();
 
-            State.Start();
+            _State.PhysicsUpdate();
 
-            State.FrameUpdate();
-            State.FrameUpdate();
-            State.FrameUpdate();
+            _State.LateUpdate();
+            _State.LateUpdate();
 
-            State.PhysicsUpdate();
-
-            State.LateUpdate();
-            State.LateUpdate();
-
-            Assert.AreEqual(2, State.AwakeCallCount);
-            Assert.AreEqual(1, State.StartCallCount);
-            Assert.AreEqual(3, State.FrameUpdateCallCount);
-            Assert.AreEqual(1, State.PhysicsUpdateCallCount);
-            Assert.AreEqual(2, State.LateUpdateCallCount);
+            Assert.AreEqual(2, _State.AwakeCallCount);
+            Assert.AreEqual(1, _State.StartCallCount);
+            Assert.AreEqual(3, _State.FrameUpdateCallCount);
+            Assert.AreEqual(1, _State.PhysicsUpdateCallCount);
+            Assert.AreEqual(2, _State.LateUpdateCallCount);
         }
     }
 }
