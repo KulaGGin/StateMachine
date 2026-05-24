@@ -69,7 +69,7 @@ namespace Kulagin.StateMachine.Core {
                 throw new ArgumentNullException(nameof(StateID), "Target state cannot be null.");
             }
 
-            if (!States.ContainsKey(StateID)) {
+            if (!States.TryGetValue(StateID, out var NewState)) {
                 throw new ArgumentException(
                     $"State '{StateID.Name}' is not registered in this state machine. " +
                     $"Register it first using SetStates().",
@@ -78,7 +78,6 @@ namespace Kulagin.StateMachine.Core {
             }
 
             CurrentState.ExitState();
-            var NewState = States[StateID];
             CurrentState = NewState;
             CurrentState.EnterState(StateEventArgs);
         }
