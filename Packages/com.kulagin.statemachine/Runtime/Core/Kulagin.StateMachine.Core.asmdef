@@ -1,4 +1,5 @@
 {
   "name": "Kulagin.StateMachine.Core",
-  "rootNamespace": "Kulagin.StateMachine.Core"
+  "rootNamespace": "Kulagin.StateMachine.Core",
+  "noEngineReferences": true
 }
