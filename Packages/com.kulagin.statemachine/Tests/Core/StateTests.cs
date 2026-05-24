@@ -34,19 +34,22 @@ namespace Kulagin.StateMachine.Core.Tests {
             }
         }
 
+        private TestStateMachine StateMachine;
+        private TestState State;
+
+        [SetUp]
+        public void Setup() {
+            StateMachine = new TestStateMachine();
+            State = new TestState(StateMachine);
+        }
+
         [Test]
         public void Constructor_StoresStateMachineReference() {
-            var StateMachine = new TestStateMachine();
-            var State = new TestState(StateMachine);
-
             Assert.AreEqual(StateMachine, State.StateMachine);
         }
 
         [Test]
         public void EnterState_DefaultDoesNothingButCanBeOverridden() {
-            var StateMachine = new TestStateMachine();
-            var State = new TestState(StateMachine);
-
             State.EnterState();
 
             Assert.IsTrue(State.Entered);
@@ -54,9 +57,6 @@ namespace Kulagin.StateMachine.Core.Tests {
 
         [Test]
         public void ExitState_DefaultDoesNothingButCanBeOverridden() {
-            var StateMachine = new TestStateMachine();
-            var State = new TestState(StateMachine);
-
             State.ExitState();
 
             Assert.IsTrue(State.Exited);
@@ -64,9 +64,6 @@ namespace Kulagin.StateMachine.Core.Tests {
 
         [Test]
         public void ApplyState_Generic_ForwardsToStateMachine() {
-            var StateMachine = new TestStateMachine();
-            var State = new TestState(StateMachine);
-
             State.ApplyState<AnotherState>("Hello");
 
             Assert.AreEqual(typeof(AnotherState), StateMachine.LastAppliedType);
@@ -75,9 +72,6 @@ namespace Kulagin.StateMachine.Core.Tests {
 
         [Test]
         public void ApplyState_Type_ForwardsToStateMachine() {
-            var StateMachine = new TestStateMachine();
-            var State = new TestState(StateMachine);
-
             State.ApplyState(typeof(AnotherState), 123);
 
             Assert.AreEqual(typeof(AnotherState), StateMachine.LastAppliedType);
