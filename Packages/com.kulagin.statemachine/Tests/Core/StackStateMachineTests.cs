@@ -438,5 +438,57 @@ namespace Kulagin.StateMachine.Core.Tests {
 
             Assert.AreEqual(1, Stack.Count);
         }
+        
+                
+        [Test]
+        public void TryPopState_ForwardsArgumentsToPreviousState() {
+            var StateMachine = new TestStackStateMachine();
+            var IdleState = new IdleState(StateMachine);
+            var PauseState = new PauseState(StateMachine);
+
+            StateMachine.SetStates(IdleState, PauseState);
+            StateMachine.StartStateMachine<IdleState>();
+            StateMachine.ApplyState<PauseState>();
+
+            StateMachine.TryPopState("ResumeContext");
+
+            Assert.AreEqual("ResumeContext", IdleState.ReceivedArgs);
+        }
+
+        [Test]
+        public void TryPopState_WithoutArguments_PassesNullToPreviousState() {
+            var StateMachine = new TestStackStateMachine();
+            var IdleState = new IdleState(StateMachine);
+            var PauseState = new PauseState(StateMachine);
+
+            StateMachine.SetStates(IdleState, PauseState);
+            StateMachine.StartStateMachine<IdleState>();
+            StateMachine.ApplyState<PauseState>();
+
+            // Poison the field so we can detect that pop overwrites it with null.
+            IdleState.ReceivedArgs = new object();
+
+            StateMachine.TryPopState();
+
+            Assert.IsNull(IdleState.ReceivedArgs);
+        }
+
+        [Test]
+        public void TryPopState_AtRoot_DoesNotInvokePreviousStateWithArgs() {
+            var StateMachine = new TestStackStateMachine();
+            var IdleState = new IdleState(StateMachine);
+
+            StateMachine.SetStates(IdleState);
+            StateMachine.StartStateMachine<IdleState>();
+
+            IdleState.ReceivedArgs = null;
+            IdleState.Entered = false;
+
+            var Result = StateMachine.TryPopState("ShouldBeIgnored");
+
+            Assert.IsFalse(Result);
+            Assert.IsFalse(IdleState.Entered);
+            Assert.IsNull(IdleState.ReceivedArgs);
+        }
     }
 }

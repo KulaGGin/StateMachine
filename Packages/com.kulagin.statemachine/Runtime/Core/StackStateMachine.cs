@@ -20,12 +20,16 @@ namespace Kulagin.StateMachine.Core {
             _StatesStack.Push(StateID);
         }
 
-        public bool TryPopState() {
-            if (!CanPop)
+        /// <summary>
+        ///  <inheritdoc cref="StateMachine{TStateMachine, TState}.ApplyState(System.Type, object)"/>
+        /// </summary>
+        public bool TryPopState(object StateEventArgs = null) {
+            if (!CanPop) {
                 return false;
+            }
 
             _StatesStack.Pop();
-            base.ApplyState(_StatesStack.Peek());
+            base.ApplyState(_StatesStack.Peek(), StateEventArgs);
             return true;
         }
     }
