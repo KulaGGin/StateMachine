@@ -1,4 +1,7 @@
+using System;
+using System.Collections.Generic;
 using NUnit.Framework;
+using System.Linq;
 
 namespace Kulagin.StateMachine.Core.Tests {
     public class StackStateMachineTests {
@@ -49,7 +52,7 @@ namespace Kulagin.StateMachine.Core.Tests {
             StateMachine.StartStateMachine<IdleState>();
 
             Assert.AreEqual(1, StateMachine.StatesStack.Count);
-            Assert.AreEqual(typeof(IdleState), StateMachine.StatesStack.Peek());
+            Assert.AreEqual(typeof(IdleState), StateMachine.StatesStack.First());
         }
 
         [Test]
@@ -79,7 +82,7 @@ namespace Kulagin.StateMachine.Core.Tests {
             StateMachine.ApplyState<PauseState>();
 
             Assert.AreEqual(2, StateMachine.StatesStack.Count);
-            Assert.AreEqual(typeof(PauseState), StateMachine.StatesStack.Peek());
+            Assert.AreEqual(typeof(PauseState), StateMachine.StatesStack.First());
         }
 
         [Test]
@@ -165,7 +168,7 @@ namespace Kulagin.StateMachine.Core.Tests {
             StateMachine.TryPopState();
 
             Assert.AreEqual(1, StateMachine.StatesStack.Count);
-            Assert.AreEqual(typeof(IdleState), StateMachine.StatesStack.Peek());
+            Assert.AreEqual(typeof(IdleState), StateMachine.StatesStack.First());
         }
 
         [Test]
@@ -422,6 +425,18 @@ namespace Kulagin.StateMachine.Core.Tests {
             StateMachine.ApplyState<PauseState>();
 
             Assert.AreEqual(StateMachine.CanPop, StateMachine.TryPopState());
+        }
+        
+        [Test]
+        public void StatesStack_IsExposedAsReadOnlyCollection() {
+            var StateMachine = new TestStackStateMachine();
+            var IdleState = new IdleState(StateMachine);
+            StateMachine.SetStates(IdleState);
+            StateMachine.StartStateMachine<IdleState>();
+            
+            IReadOnlyCollection<Type> Stack = StateMachine.StatesStack;
+
+            Assert.AreEqual(1, Stack.Count);
         }
     }
 }

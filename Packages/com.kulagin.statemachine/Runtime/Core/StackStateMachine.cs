@@ -5,26 +5,27 @@ namespace Kulagin.StateMachine.Core {
     public abstract class StackStateMachine<TStateMachine, TStateClass> : StateMachine<TStateMachine, TStateClass>
         where TStateMachine : StateMachine<TStateMachine, TStateClass>
         where TStateClass : State<TStateMachine, TStateClass> {
-        public readonly Stack<Type> StatesStack = new();
+        private readonly Stack<Type> _StatesStack = new();
+        public IReadOnlyCollection<Type> StatesStack => _StatesStack;
 
-        public bool CanPop => StatesStack.Count > 1;
+        public bool CanPop => _StatesStack.Count > 1;
 
         public override void StartStateMachine(Type StartingState) {
             base.StartStateMachine(StartingState);
-            StatesStack.Push(StartingState);
+            _StatesStack.Push(StartingState);
         }
 
         public override void ApplyState(Type StateID, object StateEventArgs = null) {
             base.ApplyState(StateID, StateEventArgs);
-            StatesStack.Push(StateID);
+            _StatesStack.Push(StateID);
         }
 
         public bool TryPopState() {
             if (!CanPop)
                 return false;
 
-            StatesStack.Pop();
-            base.ApplyState(StatesStack.Peek());
+            _StatesStack.Pop();
+            base.ApplyState(_StatesStack.Peek());
             return true;
         }
     }
