@@ -1,3 +1,5 @@
+using System;
+
 namespace Kulagin.StateMachine.Core {
     public abstract class State<TStateMachine, TState>
         where TStateMachine : StateMachine<TStateMachine, TState>
@@ -19,7 +21,7 @@ namespace Kulagin.StateMachine.Core {
             ApplyState(typeof(TNextState), StateEventArgs);
         }
 
-        public void ApplyState(System.Type NextState, object StateEventArgs = null) {
+        public void ApplyState(Type NextState, object StateEventArgs = null) {
             StateMachine.ApplyState(NextState, StateEventArgs);
         }
     }

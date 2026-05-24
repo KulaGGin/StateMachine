@@ -5,12 +5,9 @@ namespace Kulagin.StateMachine.Core {
     public class StateMachine<TStateMachine, TStateClass>
         where TStateMachine : StateMachine<TStateMachine, TStateClass>
         where TStateClass : State<TStateMachine, TStateClass> {
-        protected Dictionary<System.Type, TStateClass> States = new();
+        protected Dictionary<Type, TStateClass> States = new();
 
         public TStateClass CurrentState { get; private set; }
-
-        public StateMachine() {
-        }
 
         protected StateMachine(IEnumerable<TStateClass> StartStates) {
             SetStates(StartStates);
@@ -36,7 +33,7 @@ namespace Kulagin.StateMachine.Core {
             StartStateMachine(typeof(T));
         }
 
-        public virtual void StartStateMachine(System.Type StartingState) {
+        public virtual void StartStateMachine(Type StartingState) {
             if (StartingState == null)
                 throw new ArgumentNullException(nameof(StartingState), "Starting state cannot be null.");
 
@@ -56,16 +53,18 @@ namespace Kulagin.StateMachine.Core {
             return IsInState(typeof(T));
         }
 
-        public bool IsInState(System.Type State) {
+        public bool IsInState(Type State) {
             return States.TryGetValue(State, out var state) && CurrentState == state;
         }
 
+        // Remember: boxing for structs.
+        // Heap allocation when a struct or primitive is supplied.
         public virtual void ApplyState<T>(object StateEventArgs = null)
             where T : TStateClass {
             ApplyState(typeof(T), StateEventArgs);
         }
-
-        public virtual void ApplyState(System.Type StateID, object StateEventArgs = null) {
+        
+        public virtual void ApplyState(Type StateID, object StateEventArgs = null) {
             if (StateID == null) {
                 throw new ArgumentNullException(nameof(StateID), "Target state cannot be null.");
             }
