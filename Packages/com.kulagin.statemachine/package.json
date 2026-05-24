@@ -6,5 +6,17 @@
   "unity": "6000.0",
   "author": {
     "name": "Kulagin"
-  }
+  },
+  "license": "MIT",
+  "keywords": [
+    "state machine",
+    "state-machine",
+    "fsm",
+    "finite-state-machine",
+    "gameplay",
+    "ai",
+    "utility"
+  ],
+  "documentationUrl": "https://www.github.com/KulaGGin/StateMachine#readme",
+  "licensesUrl": "https://www.github.com/KulaGGin/StateMachine/blob/master/Packages/com.kulagin.statemachine/LICENSE.md"
 }
