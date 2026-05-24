@@ -167,13 +167,13 @@ namespace Kulagin.StateMachine.Unity.Tests {
         }
 
         [Test]
-        public void CallingLifecycleBeforeStart_DoesNotThrow() {
+        public void CallingLifecycleBeforeStart_Throws() {
             var StateMachine = new TestStateMachine();
 
             var Idle = new IdleState(StateMachine);
             StateMachine.SetStates(Idle);
 
-            Assert.Throws<InvalidOperationException>(StateMachine.Awake);
+            Assert.Throws<NullReferenceException>(StateMachine.Awake);
         }
 
         [Test]

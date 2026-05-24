@@ -7,7 +7,6 @@ namespace Kulagin.StateMachine.Unity {
         where TStateMachine : UnityStateMachine<TStateMachine, TStateClass>
         where TStateClass : GameplayState<TStateMachine, TStateClass> {
         public virtual void Awake() {
-            EnsureStarted();
             CurrentState.Awake();
         }
 
@@ -25,11 +24,6 @@ namespace Kulagin.StateMachine.Unity {
 
         public virtual void LateUpdate() {
             CurrentState.LateUpdate();
-        }
-
-        private void EnsureStarted() {
-            if (CurrentState == null)
-                throw new InvalidOperationException("StateMachine not started.");
         }
     }
 }
