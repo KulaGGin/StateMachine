@@ -1,5 +1,6 @@
 {
   "name": "Kulagin.StateMachine.Core.Tests",
+  "rootNamespace": "Kulagin.StateMachine.Core.Tests",
   "references": [
     "Kulagin.StateMachine.Core"
   ],

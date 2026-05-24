@@ -1,5 +1,6 @@
 {
   "name": "Kulagin.StateMachine.Unity",
+  "rootNamespace": "Kulagin.StateMachine.Unity",
   "references": [
     "Kulagin.StateMachine.Core"
   ]

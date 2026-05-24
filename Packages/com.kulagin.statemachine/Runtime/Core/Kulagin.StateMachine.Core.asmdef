@@ -1,3 +1,4 @@
 {
-  "name": "Kulagin.StateMachine.Core"
+  "name": "Kulagin.StateMachine.Core",
+  "rootNamespace": "Kulagin.StateMachine.Core"
 }

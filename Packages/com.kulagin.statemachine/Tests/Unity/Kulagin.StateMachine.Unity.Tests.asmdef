@@ -1,6 +1,6 @@
 {
     "name": "Kulagin.StateMachine.Unity.Tests",
-    "rootNamespace": "",
+    "rootNamespace": "Kulagin.StateMachine.Unity.Tests",
     "references": [
         "Kulagin.StateMachine.Core",
         "Kulagin.StateMachine.Unity",
