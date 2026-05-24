@@ -1,11 +1,11 @@
 using Kulagin.StateMachine.Core;
 
 namespace Kulagin.StateMachine.Unity {
-    public abstract class GameplayState<TStateMachine, TState> :
+    public abstract class UnityState<TStateMachine, TState> :
         State<TStateMachine, TState>
         where TState : State<TStateMachine, TState>
         where TStateMachine : StateMachine<TStateMachine, TState> {
-        protected GameplayState(TStateMachine StateMachine) : base(StateMachine) {
+        protected UnityState(TStateMachine StateMachine) : base(StateMachine) {
         }
 
         public virtual void Awake() {

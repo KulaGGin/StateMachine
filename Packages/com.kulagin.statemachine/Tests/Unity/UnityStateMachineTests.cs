@@ -6,7 +6,7 @@ namespace Kulagin.StateMachine.Unity.Tests {
         private class TestStateMachine : UnityStateMachine<TestStateMachine, TestState> {
         }
 
-        private class TestState : GameplayState<TestStateMachine, TestState> {
+        private class TestState : UnityState<TestStateMachine, TestState> {
             public bool AwakeCalled;
             public bool StartCalled;
             public bool PhysicsUpdateCalled;

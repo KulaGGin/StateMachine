@@ -5,7 +5,7 @@ namespace Kulagin.StateMachine.Unity {
     public abstract class UnityStateMachine<TStateMachine, TStateClass> :
         StateMachine<TStateMachine, TStateClass>
         where TStateMachine : UnityStateMachine<TStateMachine, TStateClass>
-        where TStateClass : GameplayState<TStateMachine, TStateClass> {
+        where TStateClass : UnityState<TStateMachine, TStateClass> {
         public virtual void Awake() {
             CurrentState.Awake();
         }

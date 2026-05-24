@@ -2,11 +2,11 @@ using Kulagin.StateMachine.Core;
 using NUnit.Framework;
 
 namespace Kulagin.StateMachine.Unity.Tests {
-    public class GameplayStateTests {
-        private class TestStateMachine : StateMachine<TestStateMachine, TestGameplayState> {
+    public class UnityStateTests {
+        private class TestStateMachine : StateMachine<TestStateMachine, TestUnityState> {
         }
 
-        private class TestGameplayState : GameplayState<TestStateMachine, TestGameplayState> {
+        private class TestUnityState : UnityState<TestStateMachine, TestUnityState> {
             public bool AwakeCalled;
             public bool StartCalled;
             public bool FrameUpdateCalled;
@@ -19,7 +19,7 @@ namespace Kulagin.StateMachine.Unity.Tests {
             public int PhysicsUpdateCallCount;
             public int LateUpdateCallCount;
 
-            public TestGameplayState(TestStateMachine StateMachine) : base(StateMachine) {
+            public TestUnityState(TestStateMachine StateMachine) : base(StateMachine) {
             }
 
             public override void Awake() {
@@ -52,7 +52,7 @@ namespace Kulagin.StateMachine.Unity.Tests {
         public void Constructor_StoresStateMachineReference() {
             var StateMachine = new TestStateMachine();
 
-            var State = new TestGameplayState(StateMachine);
+            var State = new TestUnityState(StateMachine);
 
             Assert.AreEqual(StateMachine, State.StateMachine);
         }
@@ -61,7 +61,7 @@ namespace Kulagin.StateMachine.Unity.Tests {
         public void Awake_CanBeOverridden() {
             var StateMachine = new TestStateMachine();
 
-            var State = new TestGameplayState(StateMachine);
+            var State = new TestUnityState(StateMachine);
 
             State.Awake();
 
@@ -72,7 +72,7 @@ namespace Kulagin.StateMachine.Unity.Tests {
         public void Awake_CallsOverrideExactlyOnce() {
             var StateMachine = new TestStateMachine();
 
-            var State = new TestGameplayState(StateMachine);
+            var State = new TestUnityState(StateMachine);
 
             State.Awake();
 
@@ -83,7 +83,7 @@ namespace Kulagin.StateMachine.Unity.Tests {
         public void Start_CanBeOverridden() {
             var StateMachine = new TestStateMachine();
 
-            var State = new TestGameplayState(StateMachine);
+            var State = new TestUnityState(StateMachine);
 
             State.Start();
 
@@ -94,7 +94,7 @@ namespace Kulagin.StateMachine.Unity.Tests {
         public void Start_CallsOverrideExactlyOnce() {
             var StateMachine = new TestStateMachine();
 
-            var State = new TestGameplayState(StateMachine);
+            var State = new TestUnityState(StateMachine);
 
             State.Start();
 
@@ -105,7 +105,7 @@ namespace Kulagin.StateMachine.Unity.Tests {
         public void FrameUpdate_CanBeOverridden() {
             var StateMachine = new TestStateMachine();
 
-            var State = new TestGameplayState(StateMachine);
+            var State = new TestUnityState(StateMachine);
 
             State.FrameUpdate();
 
@@ -116,7 +116,7 @@ namespace Kulagin.StateMachine.Unity.Tests {
         public void FrameUpdate_CallsOverrideExactlyOnce() {
             var StateMachine = new TestStateMachine();
 
-            var State = new TestGameplayState(StateMachine);
+            var State = new TestUnityState(StateMachine);
 
             State.FrameUpdate();
 
@@ -127,7 +127,7 @@ namespace Kulagin.StateMachine.Unity.Tests {
         public void PhysicsUpdate_CanBeOverridden() {
             var StateMachine = new TestStateMachine();
 
-            var State = new TestGameplayState(StateMachine);
+            var State = new TestUnityState(StateMachine);
 
             State.PhysicsUpdate();
 
@@ -138,7 +138,7 @@ namespace Kulagin.StateMachine.Unity.Tests {
         public void PhysicsUpdate_CallsOverrideExactlyOnce() {
             var StateMachine = new TestStateMachine();
 
-            var State = new TestGameplayState(StateMachine);
+            var State = new TestUnityState(StateMachine);
 
             State.PhysicsUpdate();
 
@@ -149,7 +149,7 @@ namespace Kulagin.StateMachine.Unity.Tests {
         public void LateUpdate_CanBeOverridden() {
             var StateMachine = new TestStateMachine();
 
-            var State = new TestGameplayState(StateMachine);
+            var State = new TestUnityState(StateMachine);
 
             State.LateUpdate();
 
@@ -160,7 +160,7 @@ namespace Kulagin.StateMachine.Unity.Tests {
         public void LateUpdate_CallsOverrideExactlyOnce() {
             var StateMachine = new TestStateMachine();
 
-            var State = new TestGameplayState(StateMachine);
+            var State = new TestUnityState(StateMachine);
 
             State.LateUpdate();
 
@@ -171,7 +171,7 @@ namespace Kulagin.StateMachine.Unity.Tests {
         public void MultipleLifecycleMethods_CanAllBeCalledIndependently() {
             var StateMachine = new TestStateMachine();
 
-            var State = new TestGameplayState(StateMachine);
+            var State = new TestUnityState(StateMachine);
 
             State.Awake();
             State.Start();
@@ -190,7 +190,7 @@ namespace Kulagin.StateMachine.Unity.Tests {
         public void MultipleLifecycleMethods_TrackIndependentCallCounts() {
             var StateMachine = new TestStateMachine();
 
-            var State = new TestGameplayState(StateMachine);
+            var State = new TestUnityState(StateMachine);
 
             State.Awake();
             State.Awake();
