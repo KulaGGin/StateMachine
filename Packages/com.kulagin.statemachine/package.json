@@ -9,7 +9,6 @@
   },
   "license": "MIT",
   "keywords": [
-    "state machine",
     "state-machine",
     "fsm",
     "finite-state-machine",
