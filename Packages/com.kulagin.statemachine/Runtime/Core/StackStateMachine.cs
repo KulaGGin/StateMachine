@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 
 namespace Kulagin.StateMachine.Core {
-    // TODO Add CanPop
     public abstract class StackStateMachine<TStateMachine, TStateClass> : StateMachine<TStateMachine, TStateClass>
         where TStateMachine : StateMachine<TStateMachine, TStateClass>
         where TStateClass : State<TStateMachine, TStateClass> {
