@@ -105,7 +105,7 @@ InitTestScene*.unity*
 # Auto-generated cache in Assets folder
 /[Aa]ssets/[Ss]ceneDependencyCache*
 
-# ignore Rider
+# Ignore Rider
 .idea/
 
 !.idea/codeStyles
@@ -114,3 +114,6 @@ InitTestScene*.unity*
 !.idea/inspectionProfiles/*
 !.idea/vcs.xml
 !.idea/.name
+
+# Ignore Assets
+/[Aa]ssets/*
