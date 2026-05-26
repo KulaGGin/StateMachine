@@ -7,7 +7,7 @@ namespace Kulagin.StateMachine.Core {
         where TStateClass : State<TStateMachine, TStateClass> {
         protected Dictionary<Type, TStateClass> States = new();
 
-        public TStateClass CurrentState { get; private set; }
+        public TStateClass CurrentState { get; protected set; }
 
         protected StateMachine(IEnumerable<TStateClass> StartStates) {
             SetStates(StartStates);
