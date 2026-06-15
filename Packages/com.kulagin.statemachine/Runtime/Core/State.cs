@@ -10,7 +10,8 @@ namespace Kulagin.StateMachine.Core {
 
         public readonly TStateMachine StateMachine;
 
-        public virtual void EnterState(object StateEventArgs = null) {
+        public virtual object EnterState(object StateEventArgs = null) {
+            return StateEventArgs;
         }
 
         public virtual void ExitState() {

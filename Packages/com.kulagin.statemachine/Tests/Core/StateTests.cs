@@ -20,8 +20,9 @@ namespace Kulagin.StateMachine.Core.Tests {
             public TestState(TestStateMachine TestStateMachine) : base(TestStateMachine) {
             }
 
-            public override void EnterState(object StateEventArgs = null) {
+            public override object EnterState(object StateEventArgs = null) {
                 Entered = true;
+                return StateEventArgs;
             }
 
             public override void ExitState() {

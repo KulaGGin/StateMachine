@@ -10,7 +10,7 @@ namespace Kulagin.StateMachine.Core {
         }
 
         public virtual bool HandleEvent(object Event) {
-            return false;   // default: nobody handles anything
+            return false;
         }
     }
 
@@ -38,12 +38,14 @@ namespace Kulagin.StateMachine.Core {
             }
             
             CurrentState = NewState;
-            foreach (TState StateInPath in PathFromRoot(NewState)) {
-                StateInPath.EnterState();
+            List<TState> Path = PathFromRoot(NewState);
+            object Arg = null;
+            for (int Index = Path.Count - 1; Index >= 0; Index--) {
+                Arg = Path[Index].EnterState(Arg);
             }
         }
 
-        List<TState> PathFromRoot(TState State) {
+        protected List<TState> PathFromRoot(TState State) {
             List<TState> Path = new();
             Type CurrentType = State.GetType();
             while (CurrentType != null) {
@@ -81,27 +83,24 @@ namespace Kulagin.StateMachine.Core {
             for (int Index = SourcePath.Count - 1; Index >= LowestCommonAncestorIndex; Index--) {
                 SourcePath[Index].ExitState();
             }
-
-            // Enter from Lowest Common Ancestor DOWN to target leaf. Only the leaf gets the args.
-            for (int Index = LowestCommonAncestorIndex; Index < TargetPath.Count; Index++) {
-                if (Index == TargetPath.Count - 1) {
-                    TargetPath[Index].EnterState(StateEventArgs);
-                } else {
-                    TargetPath[Index].EnterState();
-                }
+            
+            object Arg = StateEventArgs;
+            for (int Index = TargetPath.Count - 1; Index >= LowestCommonAncestorIndex; Index--) {
+                Arg = TargetPath[Index].EnterState(Arg);
             }
-
+            
             CurrentState = TargetState;
         }
         
-        public void HandleEvent(object Event) {
+        public bool Send<TEvent>(TEvent Event) {
             Type CurrentType = CurrentState.GetType();
             while (CurrentType != null) {
-                if (States[CurrentType].HandleEvent(Event)) return;       // handled → stop
-                Parents.TryGetValue(CurrentType, out CurrentType);        // not handled → ask parent
+                if (States[CurrentType] is IHandle<TEvent> Handler && Handler.Handle(Event)) {
+                    return true;                              // handled → stop
+                }
+                Parents.TryGetValue(CurrentType, out CurrentType);   // not mine → ask parent
             }
+            return false;
         }
-        
-        
     }
 }

@@ -11,8 +11,9 @@ namespace Kulagin.StateMachine.Core.Tests {
             protected TestState(TestStateMachine StateMachine) : base(StateMachine) {
             }
 
-            public override void EnterState(object StateEventArgs = null) {
+            public override object EnterState(object StateEventArgs = null) {
                 StateMachine.Log.Add($"Enter:{GetType().Name}");
+                return StateEventArgs;
             }
 
             public override void ExitState() {
@@ -58,7 +59,7 @@ namespace Kulagin.StateMachine.Core.Tests {
         }
         
         [Test]
-        public void StartStateMachine_OnChildState_EntersParentBeforeChild() {
+        public void StartStateMachine_OnChildState_EntersChildBeforeParent() {   // was: EntersParentBeforeChild
             TestStateMachine StateMachine = new();
             ParentState ParentState = new(StateMachine);
             ChildState ChildState = new(StateMachine);
@@ -67,7 +68,7 @@ namespace Kulagin.StateMachine.Core.Tests {
 
             StateMachine.StartStateMachine<ChildState>();
 
-            Assert.AreEqual(new[] { "Enter:ParentState", "Enter:ChildState" }, StateMachine.Log);
+            Assert.AreEqual(new[] { "Enter:ChildState", "Enter:ParentState" }, StateMachine.Log);
         }
         
         [Test]
@@ -163,7 +164,7 @@ namespace Kulagin.StateMachine.Core.Tests {
 
             Assert.AreEqual(new[] {
                 "Exit:Leaf1State", "Exit:Branch1State",
-                "Enter:Branch2State", "Enter:Leaf2State"
+                "Enter:Leaf2State", "Enter:Branch2State"          // was: Enter:Branch2State, Enter:Leaf2State
             }, StateMachine.Log);
         }
         
@@ -189,25 +190,6 @@ namespace Kulagin.StateMachine.Core.Tests {
                 return false;   // not mine — bubble up
             }
         }
-
-        [Test]
-        public void HandleEvent_WhenLeafDoesNotHandle_BubblesToParent() {
-            TestStateMachine StateMachine = new();
-            HandlingParentState ParentState = new(StateMachine);
-            NonHandlingChildState ChildState = new(StateMachine);
-            StateMachine.SetStates(ParentState, ChildState);
-            StateMachine.SetParent<NonHandlingChildState, HandlingParentState>();
-            StateMachine.StartStateMachine<NonHandlingChildState>();
-            StateMachine.Log.Clear();
-
-            StateMachine.HandleEvent("Attack");
-
-            Assert.AreEqual(new[] {
-                "HandleEvent:NonHandlingChildState:Attack",   // child saw it, said "not mine"
-                "HandleEvent:HandlingParentState:Attack"      // parent picked it up
-            }, StateMachine.Log);
-            Assert.IsTrue(ParentState.HandledEvent);
-        }
         
         private class HandlingChildState : TestState {
             public HandlingChildState(TestStateMachine StateMachine) : base(StateMachine) {
@@ -218,21 +200,150 @@ namespace Kulagin.StateMachine.Core.Tests {
                 return true;
             }
         }
+        
+        
+        private class ArgParentState : TestState {
+            public object ReceivedArg;
+            public ArgParentState(TestStateMachine SM) : base(SM) {}
+            public override object EnterState(object StateEventArgs = null) {
+                ReceivedArg = StateEventArgs;
+                StateMachine.Log.Add($"Enter:{GetType().Name}");
+                return StateEventArgs;
+            }
+        }
+
+        private class ArgChildState : TestState {
+            public ArgChildState(TestStateMachine SM) : base(SM) {}
+            public override object EnterState(object StateEventArgs = null) {
+                StateMachine.Log.Add($"Enter:{GetType().Name}");
+                return $"{StateEventArgs}-fromchild";   // transform, then hand up
+            }
+        }
 
         [Test]
-        public void HandleEvent_WhenLeafHandles_ParentDoesNotSeeEvent() {
+        public void StartStateMachine_OnChildState_ChildReturnedArgReachesParent() {
             TestStateMachine StateMachine = new();
-            HandlingParentState ParentState = new(StateMachine);
-            HandlingChildState ChildState = new(StateMachine);
+            ArgParentState ParentState = new(StateMachine);
+            ArgChildState ChildState = new(StateMachine);
             StateMachine.SetStates(ParentState, ChildState);
-            StateMachine.SetParent<HandlingChildState, HandlingParentState>();
-            StateMachine.StartStateMachine<HandlingChildState>();
+            StateMachine.SetParent<ArgChildState, ArgParentState>();
+
+            StateMachine.StartStateMachine<ArgChildState>();
+
+            Assert.AreEqual("-fromchild", ParentState.ReceivedArg);   // seed null → "" → "-fromchild"
+            Assert.AreEqual(new[] { "Enter:ArgChildState", "Enter:ArgParentState" }, StateMachine.Log);
+        }
+        
+        [Test]
+        public void ApplyState_OnChildState_TransformsArgUpThePath() {
+            TestStateMachine StateMachine = new();
+            ArgParentState ParentState = new(StateMachine);
+            ArgChildState ChildState = new(StateMachine);
+            IdleState IdleState = new(StateMachine);
+            StateMachine.SetStates(ParentState, ChildState, IdleState);
+            StateMachine.SetParent<ArgChildState, ArgParentState>();
+            StateMachine.StartStateMachine<IdleState>();
             StateMachine.Log.Clear();
 
-            StateMachine.HandleEvent("Attack");
+            StateMachine.ApplyState<ArgChildState>("seed");
 
-            Assert.AreEqual(new[] { "HandleEvent:HandlingChildState:Attack" }, StateMachine.Log);
-            Assert.IsFalse(ParentState.HandledEvent);
+            Assert.AreEqual("seed-fromchild", ParentState.ReceivedArg);
+            Assert.AreEqual(new[] {
+                "Exit:IdleState", "Enter:ArgChildState", "Enter:ArgParentState"
+            }, StateMachine.Log);
+        }
+        
+        private readonly struct AttackEvent { public readonly string Tag; public AttackEvent(string tag) { Tag = tag; } }
+        private readonly struct JumpEvent { }
+
+        private class SendHandlingParentState : TestState, IHandle<AttackEvent> {
+            public bool Handled;
+            public SendHandlingParentState(TestStateMachine SM) : base(SM) {}
+            public bool Handle(AttackEvent Event) {
+                Handled = true;
+                StateMachine.Log.Add($"Handle:{GetType().Name}:{Event.Tag}");
+                return true;
+            }
+        }
+
+        private class SendBubblingChildState : TestState, IHandle<AttackEvent> {
+            public SendBubblingChildState(TestStateMachine SM) : base(SM) {}
+            public bool Handle(AttackEvent Event) {
+                StateMachine.Log.Add($"Handle:{GetType().Name}:{Event.Tag}");
+                return false;   // not mine — bubble
+            }
+        }
+
+        [Test]
+        public void Send_WhenLeafReturnsFalse_BubblesToParent() {
+            TestStateMachine StateMachine = new();
+            SendHandlingParentState ParentState = new(StateMachine);
+            SendBubblingChildState ChildState = new(StateMachine);
+            StateMachine.SetStates(ParentState, ChildState);
+            StateMachine.SetParent<SendBubblingChildState, SendHandlingParentState>();
+            StateMachine.StartStateMachine<SendBubblingChildState>();
+            StateMachine.Log.Clear();
+
+            bool Result = StateMachine.Send(new AttackEvent("hit"));
+
+            Assert.IsTrue(Result);
+            Assert.IsTrue(ParentState.Handled);
+            Assert.AreEqual(new[] {
+                "Handle:SendBubblingChildState:hit",
+                "Handle:SendHandlingParentState:hit"
+            }, StateMachine.Log);
+        }
+        
+        private class PlainChildState : TestState {   // implements no IHandle<>
+            public PlainChildState(TestStateMachine SM) : base(SM) {}
+        }
+
+        [Test]
+        public void Send_WhenStateDoesNotImplementHandler_SkipsItAndBubbles() {
+            TestStateMachine StateMachine = new();
+            SendHandlingParentState ParentState = new(StateMachine);
+            PlainChildState ChildState = new(StateMachine);
+            StateMachine.SetStates(ParentState, ChildState);
+            StateMachine.SetParent<PlainChildState, SendHandlingParentState>();
+            StateMachine.StartStateMachine<PlainChildState>();
+            StateMachine.Log.Clear();
+
+            bool Result = StateMachine.Send(new AttackEvent("hit"));
+
+            Assert.IsTrue(Result);
+            Assert.AreEqual(new[] { "Handle:SendHandlingParentState:hit" }, StateMachine.Log);
+        }
+        
+        [Test]
+        public void Send_WhenNobodyHandles_ReturnsFalse() {
+            TestStateMachine StateMachine = new();
+            PlainChildState ChildState = new(StateMachine);
+            StateMachine.SetStates(ChildState);
+            StateMachine.StartStateMachine<PlainChildState>();
+            StateMachine.Log.Clear();
+
+            Assert.IsFalse(StateMachine.Send(new AttackEvent("hit")));
+            Assert.IsEmpty(StateMachine.Log);
+        }
+        
+        private class MultiEventState : TestState, IHandle<AttackEvent>, IHandle<JumpEvent> {
+            public MultiEventState(TestStateMachine SM) : base(SM) {}
+            public bool Handle(AttackEvent Event) { StateMachine.Log.Add("Attack"); return true; }
+            public bool Handle(JumpEvent Event)   { StateMachine.Log.Add("Jump");   return true; }
+        }
+
+        [Test]
+        public void Send_RoutesToHandlerOfMatchingEventType() {
+            TestStateMachine StateMachine = new();
+            MultiEventState State = new(StateMachine);
+            StateMachine.SetStates(State);
+            StateMachine.StartStateMachine<MultiEventState>();
+            StateMachine.Log.Clear();
+
+            StateMachine.Send(new JumpEvent());
+            StateMachine.Send(new AttackEvent("x"));
+
+            Assert.AreEqual(new[] { "Jump", "Attack" }, StateMachine.Log);
         }
     }
 }
