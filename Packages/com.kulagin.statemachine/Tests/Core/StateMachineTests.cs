@@ -34,6 +34,12 @@ namespace Kulagin.StateMachine.Core.Tests {
             ExitCount++;
         }
     }
+    
+    
+    readonly struct AttackEvent {
+        public readonly string Tag;
+        public AttackEvent(string Tag) { this.Tag = Tag; }
+    }
 
     class IdleState : TestState {
         public IdleState(TestStateMachine TestStateMachine) : base(TestStateMachine) {
@@ -43,6 +49,11 @@ namespace Kulagin.StateMachine.Core.Tests {
     class WalkingState : TestState {
         public WalkingState(TestStateMachine TestStateMachine) : base(TestStateMachine) {
         }
+    }
+    
+    public readonly struct HitEvent {
+        public readonly string Tag;
+        public HitEvent(string Tag) { this.Tag = Tag; }
     }
     
     public class TestStateMachineTests {
@@ -334,6 +345,104 @@ namespace Kulagin.StateMachine.Core.Tests {
             Assert.Throws<ArgumentException>(() => TestStateMachine.ApplyState<WalkingState>());
 
             Assert.AreEqual(IdleState, TestStateMachine.CurrentState);
+        }
+        
+        private class AttackHandlerState : TestState, IHandle<AttackEvent> {
+            public bool Handled;
+            public string LastTag;
+            public AttackHandlerState(TestStateMachine StateMachine) : base(StateMachine) {
+            }
+
+            public bool Handle(AttackEvent Event) {
+                Handled = true;
+                LastTag = Event.Tag;
+                return true;
+            }
+        }
+
+        [Test]
+        public void Send_WhenCurrentStateHandles_ReturnsTrueAndInvokesHandler() {
+            TestStateMachine StateMachine = new();
+            AttackHandlerState State = new(StateMachine);
+            StateMachine.SetStates(State);
+            StateMachine.StartStateMachine<AttackHandlerState>();
+
+            bool Result = StateMachine.Send(new AttackEvent("hit"));
+
+            Assert.IsTrue(Result);
+            Assert.IsTrue(State.Handled);
+            Assert.AreEqual("hit", State.LastTag);
+        }
+        
+        
+        private class PlainState : TestState {   // implements no IHandle<>
+            public PlainState(TestStateMachine StateMachine) : base(StateMachine) {
+            }
+        }
+
+        [Test]
+        public void Send_WhenCurrentStateDoesNotImplementHandler_ReturnsFalse() {
+            TestStateMachine StateMachine = new();
+            PlainState State = new(StateMachine);
+            StateMachine.SetStates(State);
+            StateMachine.StartStateMachine<PlainState>();
+
+            Assert.IsFalse(StateMachine.Send(new AttackEvent("hit")));
+        }
+        
+        private abstract class DefendingStateBase : TestState, IHandle<AttackEvent> {
+            public bool Handled;
+            protected DefendingStateBase(TestStateMachine StateMachine) : base(StateMachine) {
+            }
+
+            public virtual bool Handle(AttackEvent Event) {
+                Handled = true;
+                return true;
+            }
+        }
+
+        private class DefendingLeafState : DefendingStateBase {   // overrides nothing — inherits Handle
+            public DefendingLeafState(TestStateMachine StateMachine) : base(StateMachine) {
+            }
+        }
+
+        [Test]
+        public void Send_FindsHandlerInheritedFromBaseStateClass() {
+            TestStateMachine StateMachine = new();
+            DefendingLeafState State = new(StateMachine);
+            StateMachine.SetStates(State);
+            StateMachine.StartStateMachine<DefendingLeafState>();
+
+            bool Result = StateMachine.Send(new AttackEvent("x"));
+
+            Assert.IsTrue(Result);
+            Assert.IsTrue(State.Handled);
+        }
+        
+        
+        private readonly struct DuckEvent { }
+
+        private class DualHandlerState : TestState, IHandle<HitEvent>, IHandle<DuckEvent> {
+            public string Last;
+            public DualHandlerState(TestStateMachine StateMachine) : base(StateMachine) {
+            }
+
+            public bool Handle(HitEvent Event)  { Last = "Hit";  return true; }
+            public bool Handle(DuckEvent Event) { Last = "Duck"; return true; }
+        }
+
+        [Test]
+        public void Send_RoutesToHandlerOfMatchingEventType() {
+            TestStateMachine StateMachine = new();
+            DualHandlerState State = new(StateMachine);
+            StateMachine.SetStates(State);
+            StateMachine.StartStateMachine<DualHandlerState>();
+
+            StateMachine.Send(new DuckEvent());
+            Assert.AreEqual("Duck", State.Last);
+
+            StateMachine.Send(new HitEvent("x"));
+            Assert.AreEqual("Hit", State.Last);
         }
     }
 }

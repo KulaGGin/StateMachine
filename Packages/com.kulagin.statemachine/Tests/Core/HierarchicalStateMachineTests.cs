@@ -345,5 +345,53 @@ namespace Kulagin.StateMachine.Core.Tests {
 
             Assert.AreEqual(new[] { "Jump", "Attack" }, StateMachine.Log);
         }
+        
+        private class HierMachine : HierarchicalStateMachine<HierMachine, HierState> {
+        }
+
+        private abstract class HierState : HierarchicalState<HierMachine, HierState> {
+            protected HierState(HierMachine StateMachine) : base(StateMachine) {
+            }
+        }
+        
+        
+
+
+        private class BubblingLeafState : HierState, IHandle<HitEvent> {
+            public BubblingLeafState(HierMachine StateMachine) : base(StateMachine) {
+            }
+
+            public bool Handle(HitEvent Event) {
+                return false;   // not mine — bubble up
+            }
+        }
+
+        private class RootHandlerState : HierState, IHandle<HitEvent> {
+            public bool Handled;
+            public RootHandlerState(HierMachine StateMachine) : base(StateMachine) {
+            }
+
+            public bool Handle(HitEvent Event) {
+                Handled = true;
+                return true;
+            }
+        }
+
+        [Test]
+        public void Send_ThroughBaseReference_OnHierarchicalMachine_StillBubbles() {
+            HierMachine Machine = new();
+            RootHandlerState Parent = new(Machine);
+            BubblingLeafState Child = new(Machine);
+            Machine.SetStates(Parent, Child);
+            Machine.SetParent<BubblingLeafState, RootHandlerState>();
+            Machine.StartStateMachine<BubblingLeafState>();
+
+            // Hold it through the FLAT base type — this is the polymorphism we're proving.
+            StateMachine<HierMachine, HierState> BaseReference = Machine;
+            bool Result = BaseReference.Send(new HitEvent("hit"));
+
+            Assert.IsTrue(Result);          // bubbled from child up to parent
+            Assert.IsTrue(Parent.Handled);
+        }
     }
 }

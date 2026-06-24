@@ -81,5 +81,9 @@ namespace Kulagin.StateMachine.Core {
             CurrentState = NewState;
             CurrentState.EnterState(StateEventArgs);
         }
+        
+        public virtual bool Send<TEvent>(TEvent Event) {
+            return CurrentState is IHandle<TEvent> Handler && Handler.Handle(Event);
+        }
     }
 }

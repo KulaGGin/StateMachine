@@ -92,7 +92,7 @@ namespace Kulagin.StateMachine.Core {
             CurrentState = TargetState;
         }
         
-        public bool Send<TEvent>(TEvent Event) {
+        public override bool Send<TEvent>(TEvent Event) {
             Type CurrentType = CurrentState.GetType();
             while (CurrentType != null) {
                 if (States[CurrentType] is IHandle<TEvent> Handler && Handler.Handle(Event)) {
