@@ -2,12 +2,13 @@ using System;
 using System.Collections.Generic;
 
 namespace Kulagin.StateMachine.Core {
-    public class StateMachine<TStateMachine, TStateClass>
+    public class StateMachine<TStateMachine, TStateClass> : IStateMachine
         where TStateMachine : StateMachine<TStateMachine, TStateClass>
         where TStateClass : State<TStateMachine, TStateClass> {
         protected Dictionary<Type, TStateClass> States = new();
 
         public TStateClass CurrentState { get; protected set; }
+        public Type CurrentStateType => CurrentState?.GetType();
 
         protected StateMachine(IEnumerable<TStateClass> StartStates) {
             SetStates(StartStates);

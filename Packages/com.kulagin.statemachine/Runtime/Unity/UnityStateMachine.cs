@@ -3,7 +3,7 @@ using System;
 
 namespace Kulagin.StateMachine.Unity {
     public abstract class UnityStateMachine<TStateMachine, TStateClass> :
-        StateMachine<TStateMachine, TStateClass>
+        StateMachine<TStateMachine, TStateClass>, IUnityStateMachine
         where TStateMachine : UnityStateMachine<TStateMachine, TStateClass>
         where TStateClass : UnityState<TStateMachine, TStateClass> {
         public virtual void Awake() {

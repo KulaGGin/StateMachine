@@ -393,5 +393,38 @@ namespace Kulagin.StateMachine.Core.Tests {
             Assert.IsTrue(Result);          // bubbled from child up to parent
             Assert.IsTrue(Parent.Handled);
         }
+
+        readonly struct WhistleEvent {
+            public readonly int Second;
+            public WhistleEvent(int Second) { this.Second = Second; }
+        }
+
+        class FaceoffState : TestState, IHandle<WhistleEvent> {
+            public bool Whistled;
+            public int LastSecond;
+            public FaceoffState(TestStateMachine StateMachine) : base(StateMachine) {
+            }
+
+            public bool Handle(WhistleEvent Event) {
+                Whistled = true;
+                LastSecond = Event.Second;
+                return true;
+            }
+        }
+
+        [Test]
+        public void Send_ThroughIStateMachine_ReachesCurrentStateHandler() {
+            TestStateMachine Machine = new();
+            FaceoffState Faceoff = new(Machine);
+            Machine.SetStates(Faceoff);
+            Machine.StartStateMachine<FaceoffState>();
+
+            IStateMachine StateMachine = Machine;               // erased handle
+            bool Result = StateMachine.Send(new WhistleEvent(12));
+
+            Assert.IsTrue(Result);
+            Assert.IsTrue(Faceoff.Whistled);
+            Assert.AreEqual(12, Faceoff.LastSecond);
+        }
     }
 }

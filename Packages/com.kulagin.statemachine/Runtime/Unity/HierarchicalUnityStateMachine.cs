@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using Kulagin.StateMachine.Core;
 
 namespace Kulagin.StateMachine.Unity {
-    public abstract class HierarchicalUnityStateMachine<TStateMachine, TState> : HierarchicalStateMachine<TStateMachine, TState>
+    public abstract class HierarchicalUnityStateMachine<TStateMachine, TState> :
+        HierarchicalStateMachine<TStateMachine, TState>, IUnityStateMachine
         where TStateMachine : HierarchicalUnityStateMachine<TStateMachine, TState>
         where TState : HierarchicalUnityState<TStateMachine, TState> {
 
