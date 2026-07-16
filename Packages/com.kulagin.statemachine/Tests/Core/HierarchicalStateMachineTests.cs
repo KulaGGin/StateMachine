@@ -45,6 +45,17 @@ namespace Kulagin.StateMachine.Core.Tests {
             public OtherState(TestStateMachine StateMachine) : base(StateMachine) {
             }
         }
+        
+        private class ReroutingState : TestState {
+            public ReroutingState(TestStateMachine StateMachine) : base(StateMachine) {
+            }
+
+            public override object EnterState(object StateEventArgs = null) {
+                base.EnterState(StateEventArgs);
+                StateMachine.ApplyState<IdleState>();
+                return StateEventArgs;
+            }
+        }
 
         [Test]
         public void StartStateMachine_OnFlatState_SetsCurrentStateAndCallsEnter() {
@@ -425,6 +436,53 @@ namespace Kulagin.StateMachine.Core.Tests {
             Assert.IsTrue(Result);
             Assert.IsTrue(Faceoff.Whistled);
             Assert.AreEqual(12, Faceoff.LastSecond);
+        }
+        
+        [Test]
+        public void ApplyState_WhenEnterStateTransitionsAway_NestedTargetBecomesCurrentState() {
+            TestStateMachine StateMachine = new();
+            ReroutingState ReroutingState = new(StateMachine);
+            IdleState IdleState = new(StateMachine);
+            WalkingState WalkingState = new(StateMachine);
+            StateMachine.SetStates(ReroutingState, IdleState, WalkingState);
+            StateMachine.StartStateMachine<WalkingState>();
+            StateMachine.Log.Clear();
+
+            StateMachine.ApplyState<ReroutingState>();
+
+            Assert.AreEqual(IdleState, StateMachine.CurrentState);
+        }
+
+        [Test]
+        public void ApplyState_WhenEnterStateTransitionsAway_ExitsTheReroutingStateNotTheSourceAgain() {
+            TestStateMachine StateMachine = new();
+            ReroutingState ReroutingState = new(StateMachine);
+            IdleState IdleState = new(StateMachine);
+            WalkingState WalkingState = new(StateMachine);
+            StateMachine.SetStates(ReroutingState, IdleState, WalkingState);
+            StateMachine.StartStateMachine<WalkingState>();
+            StateMachine.Log.Clear();
+
+            StateMachine.ApplyState<ReroutingState>();
+
+            Assert.AreEqual(new[] {
+                "Exit:WalkingState", "Enter:ReroutingState", "Exit:ReroutingState", "Enter:IdleState"
+            }, StateMachine.Log);
+        }
+
+        [Test]
+        public void ApplyState_WhenEnterStateDoesNotTransition_StillSetsCurrentState() {
+            TestStateMachine StateMachine = new();
+            IdleState IdleState = new(StateMachine);
+            WalkingState WalkingState = new(StateMachine);
+            StateMachine.SetStates(IdleState, WalkingState);
+            StateMachine.StartStateMachine<IdleState>();
+            StateMachine.Log.Clear();
+
+            StateMachine.ApplyState<WalkingState>();
+
+            Assert.AreEqual(WalkingState, StateMachine.CurrentState);
+            Assert.AreEqual(new[] { "Exit:IdleState", "Enter:WalkingState" }, StateMachine.Log);
         }
     }
 }

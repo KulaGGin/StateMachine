@@ -84,12 +84,13 @@ namespace Kulagin.StateMachine.Core {
                 SourcePath[Index].ExitState();
             }
             
+            CurrentState = TargetState;
+            
+            
             object Arg = StateEventArgs;
             for (int Index = TargetPath.Count - 1; Index >= LowestCommonAncestorIndex; Index--) {
                 Arg = TargetPath[Index].EnterState(Arg);
             }
-            
-            CurrentState = TargetState;
         }
         
         public override bool Send<TEvent>(TEvent Event) {
